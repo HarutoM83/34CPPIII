@@ -12,20 +12,43 @@ namespace
     struct CBParam // register(b0)
     {
         Color baseColor;
+        float Speed;
+        float padding[3];
     };
     constexpr int CBSlot = 0;
 
     Color colorTable[] =
     {
         Color(1, 1, 1),
+        Color(1, 1, 0.5),
         Color(1, 1, 0),
+        Color(1, 0.5, 1),
+        Color(1, 0.5, 0.5),
+        Color(1, 0.5, 0),
         Color(1, 0, 1),
-        Color(0, 1, 1),
+        Color(1, 0, 0.5),
+        Color(1, 0, 0),
+        Color(0.5, 1, 1),
+        Color(0.5, 1, 0.5),
+        Color(0.5, 1, 0),
+        Color(0.5, 0.5, 1),
+        Color(0.5, 0.5, 0.5),
+        Color(0.5, 0.5, 0),
+        Color(0.5, 0, 1),
+        Color(0.5, 0, 0.5),
         Color(0.5, 0, 0),
+        Color(0, 1, 1),
+        Color(0, 1, 0.5),
+        Color(0, 1, 0),
+        Color(0, 0.5, 1),
+        Color(0, 0.5, 0.5),
         Color(0, 0.5, 0),
+        Color(0, 0, 1),
         Color(0, 0, 0.5),
+        Color(0, 0, 0),
     };
     constexpr int tableSize = sizeof(colorTable) / sizeof(Color);
+    float speed = 1.0f;
 }
 
 
@@ -44,16 +67,28 @@ void CBController::Start()
 
 void CBController::Update()
 {
+    if (Input::GetKeyUp(Keyboard::Up))
+    {
+        colorIndex = (colorIndex - 1 + tableSize) % tableSize;
+    }
     if(Input::GetKeyDown(Keyboard::Down))
     {
         colorIndex = (colorIndex + 1) % tableSize;
     }
-
+    if (Input::GetKey(Keyboard::Left))
+    {
+        speed -= UniDx::Time::deltaTime;
+    }
+    if (Input::GetKey(Keyboard::Right))
+    {
+        speed += UniDx::Time::deltaTime;
+    }
 
     CBParam cb;
 
     // カラーテーブルから現在のインデクスの色を設定
     cb.baseColor = colorTable[colorIndex];
+    cb.Speed = speed;
 
     // 定数バッファを更新
     D3DManager::getInstance()->GetContext()->UpdateSubresource(constantBuffer.Get(), 0, nullptr, &cb, 0, 0);
